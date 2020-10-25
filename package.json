@@ -1,8 +1,20 @@
 {
   "name": "gongo-server",
-  "version": "1.0.0",
-  "main": "lib/index.js",
+  "version": "0.0.1",
+  "author": "Gadi Cohen <dragon@wastelands.net>",
+  "description": "DX-focused in-browser database with offline and realtime",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gongojs/gongo-server"
+  },
+  "main": "lib/index.js",
+  "keywords": [
+    "database",
+    "serverless",
+    "offline",
+    "minimongo"
+  ],
   "devDependencies": {
     "eslint": "^6.8.0",
     "jest": "^25.1.0"
