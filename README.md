@@ -4,6 +4,8 @@
 
 Copyright (c) 2020 by Gadi Cohen.  MIT licensed.
 
+![npm](https://img.shields.io/npm/v/gongo-server) [![CircleCI](https://img.shields.io/circleci/build/github/gongojs/gongo-server)](https://circleci.com/gh/gongojs/gongo-server) [![coverage](https://img.shields.io/codecov/c/github/gongojs/gongo-server)](https://codecov.io/gh/gongojs/gongo-server) ![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 ## QuickStart
 
 Assumes files placed in `api` directory are serverless functions (aka lambdas
