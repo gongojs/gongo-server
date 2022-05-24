@@ -3,6 +3,7 @@ import type DataBaseAdapter from "./DataBaseAdapter";
 import type { Request, RequestHandler } from "express";
 import { publications, publish, subscribeMethod } from "./publications";
 import { GSExpressPost } from "./express";
+import builtinMethods from "./builtinMethods";
 
 export interface MethodProps {
   gs: GongoServerless;
@@ -33,7 +34,7 @@ export default class GongoServerless {
   publish: typeof publish;
 
   constructor() {
-    this.methods = new Map();
+    this.methods = new Map(Object.entries(builtinMethods));
     this._publications = publications;
     this.publish = publish;
     this.method("subscribe", subscribeMethod);

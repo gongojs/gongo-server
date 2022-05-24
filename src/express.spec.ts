@@ -11,8 +11,6 @@ describe("express", () => {
   const app = express();
   app.post("/", jsonParser, gs.expressPost());
 
-  gs.method("echo", (query) => query);
-
   it("sends HTTP 400 Bad Request on non-json", async () => {
     const response = await request(app).post("/").type("form").send("text");
     expect(response.statusCode).toBe(400);

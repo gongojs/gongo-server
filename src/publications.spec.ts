@@ -37,7 +37,7 @@ describe("publications", () => {
         },
       };
 
-      publish("echo", async (opts, props) => opts);
+      publish("echo", async (db, opts, props) => opts);
       const result = await subscribeMethod(
         // @ts-expect-error: test stub
         { name: "echo", opts: "opts" },

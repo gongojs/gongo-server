@@ -40,7 +40,7 @@
     "test": "jest src",
     "coverage": "jest src --coverage",
     "prettier": "prettier -w src",
-    "build": "tsc src"
+    "build": "tsc"
   },
   "engines": {
     "node": ">=14.19.2"

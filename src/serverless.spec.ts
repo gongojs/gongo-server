@@ -26,7 +26,6 @@ describe("GongoServerless2", () => {
 
     it("passes query", async () => {
       const gs = new GongoServerless();
-      gs.method("echo", (query) => query);
       // @ts-expect-error: stub
       expect(await gs._methodExec("echo", "test", {})).toMatchObject({
         $result: "test",

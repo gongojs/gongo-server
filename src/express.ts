@@ -11,7 +11,8 @@ export async function GSExpressPost(
   const $gongo = req.body.$gongo;
 
   if (!$gongo) {
-    res.sendStatus(400);
+    //res.sendStatus(400); // not available in vercel
+    res.status(400).send("Bad Request");
     res.end();
     return;
   }
