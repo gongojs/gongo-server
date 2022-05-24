@@ -33,7 +33,8 @@ export default class GongoServerless {
   _publications: typeof publications;
   publish: typeof publish;
 
-  constructor() {
+  constructor({ dba }: { dba?: DataBaseAdapter } = {}) {
+    this.dba = dba;
     this.methods = new Map(Object.entries(builtinMethods));
     this._publications = publications;
     this.publish = publish;

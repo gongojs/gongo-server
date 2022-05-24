@@ -1,4 +1,5 @@
-import type { PublicationResults } from "./publications";
+import type { PublicationResults, UpdatedAt } from "./publications";
+import type Auth from "./auth-class";
 
 interface InstanceWithToStringMethod {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,5 +24,11 @@ interface DbaUsers {
 
 export default interface DataBaseAdapter {
   Users: DbaUsers;
-  publishHelper(results: unknown): Promise<PublicationResults>;
+  publishHelper(
+    results: unknown,
+    updatedAt?: UpdatedAt,
+    auth?: Auth, // replace with methodProps after modding dba
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    req?: any // replace with methodProps after updating dba
+  ): Promise<PublicationResults>;
 }
