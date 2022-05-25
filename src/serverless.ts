@@ -30,14 +30,12 @@ export type MethodFunction = (query: any, props: MethodProps) => unknown;
 export default class GongoServerless {
   methods: Map<string, MethodFunction>;
   dba?: DataBaseAdapter;
-  _publications: typeof publications;
-  publish: typeof publish;
+  _publications = publications;
+  publish = publish;
 
   constructor({ dba }: { dba?: DataBaseAdapter } = {}) {
     this.dba = dba;
     this.methods = new Map(Object.entries(builtinMethods));
-    this._publications = publications;
-    this.publish = publish;
     this.method("subscribe", subscribeMethod);
   }
 
