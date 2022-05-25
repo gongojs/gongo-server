@@ -4,6 +4,8 @@ import type { Request, RequestHandler } from "express";
 import { publications, publish, subscribeMethod } from "./publications";
 import { GSExpressPost } from "./express";
 import builtinMethods from "./builtinMethods";
+//import ARSON from "arson";
+const ARSON = require("arson");
 
 export interface MethodProps {
   gs: GongoServerless;
@@ -32,11 +34,19 @@ export default class GongoServerless {
   dba?: DataBaseAdapter;
   _publications = publications;
   publish = publish;
+  ARSON = ARSON;
 
   constructor({ dba }: { dba?: DataBaseAdapter } = {}) {
     this.dba = dba;
     this.methods = new Map(Object.entries(builtinMethods));
     this.method("subscribe", subscribeMethod);
+    this.method("changeSet", async (query, props) => {
+      // TODO, v2 dba
+      console.log(query);
+      return dba && dba.processChangeSet(query, props);
+    });
+
+    if (dba && dba.onInit) dba.onInit(this);
   }
 
   method(name: string, func: MethodFunction) {
@@ -79,6 +89,8 @@ export default class GongoServerless {
           },
         };
       }
+      console.error(`Error in ${name}(${JSON.stringify(query)}):`);
+      console.error(error);
     }
     out.time = Date.now() - start;
 

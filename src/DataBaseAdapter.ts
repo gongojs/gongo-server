@@ -1,5 +1,7 @@
 import type { PublicationResults, UpdatedAt } from "./publications";
 import type Auth from "./auth-class";
+import type { MethodProps } from "./serverless";
+import type GongoServerless from "./serverless";
 
 interface InstanceWithToStringMethod {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,7 +15,7 @@ export interface DbaUser {
   _id: string | InstanceWithToStringMethod;
 }
 
-interface DbaUsers {
+export interface DbaUsers {
   setSessionData(sid: string, data: Record<string, unknown>): Promise<void>;
   getSessionData(sid: string): Promise<Record<string, unknown>>;
   getUserWithEmailAndPassword(
@@ -22,8 +24,20 @@ interface DbaUsers {
   ): Promise<DbaUser | null>;
 }
 
+export type ChangeSetError = [
+  collection: string,
+  id: string,
+  error: Record<string, unknown>
+];
+
+export interface ChangeSetResults {
+  $errors: Array<ChangeSetError>;
+}
+
 export default interface DataBaseAdapter {
+  onInit(gs: GongoServerless): void;
   Users: DbaUsers;
+
   publishHelper(
     results: unknown,
     updatedAt?: UpdatedAt,
@@ -31,4 +45,9 @@ export default interface DataBaseAdapter {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     req?: any // replace with methodProps after updating dba
   ): Promise<PublicationResults>;
+
+  processChangeSet(
+    query: Record<string, unknown>,
+    props: MethodProps
+  ): Promise<ChangeSetResults>;
 }
