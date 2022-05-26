@@ -1,15 +1,31 @@
 import express from "express";
+import type { Response } from "express";
 import bodyParser from "body-parser";
 import request from "supertest";
 
 import GongoServerless from "./serverless";
 
-const jsonParser = bodyParser.json();
+// const jsonParser = bodyParser.json();
+const textParser = bodyParser.text();
 
 describe("express", () => {
   const gs = new GongoServerless();
   const app = express();
-  app.post("/", jsonParser, gs.expressPost());
+  app.post("/", textParser, gs.expressPost());
+
+  function sendQuery(query: Record<string, unknown>) {
+    return (
+      request(app)
+        .post("/")
+        .set("Content-Type", "text/plain; charset=utf-8")
+        //.set("Accept", "text/plain")
+        .send(gs.ARSON.encode(query))
+        .then((response) => {
+          response.body = gs.ARSON.decode(response.text);
+          return response;
+        })
+    );
+  }
 
   it("sends HTTP 400 Bad Request on non-json", async () => {
     const response = await request(app).post("/").type("form").send("text");
@@ -24,10 +40,7 @@ describe("express", () => {
 
   it("sends error on version mismatch", async () => {
     const query = { $gongo: 1 };
-    const response = await request(app)
-      .post("/")
-      .set("Accept", "application/json")
-      .send(query);
+    const response = await sendQuery(query);
     expect(response.statusCode).toBe(200);
     expect(response.body.$error).toBeDefined();
     expect(response.body.$error.message).toMatch(/^Unsupported API version/);
@@ -41,7 +54,7 @@ describe("express", () => {
         ["echo", 2],
       ],
     };
-    const response = await request(app).post("/").send(query);
+    const response = await sendQuery(query);
     expect(response.statusCode).toBe(200);
     expect(response.body.$error).not.toBeDefined();
     expect(response.body.calls).toMatchObject([{ $result: 1 }, { $result: 2 }]);

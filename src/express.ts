@@ -30,11 +30,14 @@ export async function GSExpressPost(
   }
 
   if (query.$gongo !== 2) {
-    res.json({
-      $error: {
-        message: `Unsupported API version.  Requested: ${query.$gongo}, Available: 2`,
-      },
-    });
+    // res.status(400);
+    res.send(
+      this.ARSON.encode({
+        $error: {
+          message: `Unsupported API version.  Requested: ${query.$gongo}, Available: 2`,
+        },
+      })
+    );
     res.end();
     return;
   }
