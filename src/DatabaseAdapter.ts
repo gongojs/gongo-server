@@ -1,5 +1,4 @@
-import type { PublicationResults, UpdatedAt } from "./publications";
-import type Auth from "./auth-class";
+import type { PublicationProps, PublicationResults } from "./publications";
 import type { MethodProps } from "./serverless";
 import type GongoServerless from "./serverless";
 
@@ -34,16 +33,13 @@ export interface ChangeSetResults {
   $errors: Array<ChangeSetError>;
 }
 
-export default interface DataBaseAdapter {
+export default interface DatabaseAdapter {
   onInit(gs: GongoServerless): void;
   Users: DbaUsers;
 
   publishHelper(
     results: unknown,
-    updatedAt?: UpdatedAt,
-    auth?: Auth, // replace with methodProps after modding dba
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    req?: any // replace with methodProps after updating dba
+    props: PublicationProps
   ): Promise<PublicationResults>;
 
   processChangeSet(

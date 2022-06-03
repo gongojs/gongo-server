@@ -1,5 +1,5 @@
 import type { MethodProps } from "./serverless";
-import type DataBaseAdapter from "./DataBaseAdapter";
+import type DatabaseAdapter from "./DatabaseAdapter";
 
 export interface CollectionResults {
   coll: string;
@@ -26,11 +26,12 @@ export interface PublicationResults {
 export type UpdatedAt = Record<string, number>;
 
 export interface PublicationProps extends MethodProps {
+  name: string;
   updatedAt: UpdatedAt;
 }
 
 export type PublicationFunction = (
-  db: DataBaseAdapter,
+  db: DatabaseAdapter,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   query: any,
   props: MethodProps
@@ -57,18 +58,19 @@ export async function subscribeMethod(
   const publication = publications.get(name);
   if (!publication) throw new Error("No such publication: " + name);
 
-  const publicationProps: PublicationProps = { ...props, updatedAt };
+  const publicationProps: PublicationProps = { ...props, name, updatedAt };
 
   let results = await publication(props.dba, opts, publicationProps);
 
-  // new: not yet implemeted
-  //results = await props.dba.publishHelper(results);
+  results = await props.dba.publishHelper(results, publicationProps);
+  /*
   results = await props.dba.publishHelper(
     results,
     updatedAt,
     props.auth,
     props.req
   );
+  */
 
   return results;
 }

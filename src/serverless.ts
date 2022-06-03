@@ -1,5 +1,5 @@
 import type Auth from "./auth-class";
-import type DataBaseAdapter from "./DataBaseAdapter";
+import type DatabaseAdapter from "./DatabaseAdapter";
 import type { Request, RequestHandler } from "express";
 import { publications, publish, subscribeMethod } from "./publications";
 import { GSExpressPost } from "./express";
@@ -11,7 +11,7 @@ export interface MethodProps {
   gs: GongoServerless;
   auth: Auth;
   req: Request;
-  dba: DataBaseAdapter;
+  dba: DatabaseAdapter;
 }
 
 export interface ErrorObject {
@@ -31,13 +31,13 @@ export type MethodFunction = (query: any, props: MethodProps) => unknown;
 
 export default class GongoServerless {
   methods: Map<string, MethodFunction>;
-  dba?: DataBaseAdapter;
+  dba?: DatabaseAdapter;
   _publications = publications;
   publish = publish;
   ARSON = ARSON;
   _supressConsoleErrors = false;
 
-  constructor({ dba }: { dba?: DataBaseAdapter } = {}) {
+  constructor({ dba }: { dba?: DatabaseAdapter } = {}) {
     this.dba = dba;
     this.methods = new Map(Object.entries(builtinMethods));
     this.method("subscribe", subscribeMethod);

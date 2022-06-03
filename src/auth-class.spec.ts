@@ -1,5 +1,5 @@
 import Auth from "./auth-class";
-import type DataBaseAdapter from "./DataBaseAdapter";
+import type DatabaseAdapter from "./DatabaseAdapter";
 
 describe("Auth", () => {
   it("constructor", () => {
@@ -12,7 +12,7 @@ describe("Auth", () => {
   });
 
   it("sid", async () => {
-    const dba = {} as DataBaseAdapter;
+    const dba = {} as DatabaseAdapter;
     const auth = new Auth(dba, {});
     expect(await auth.sid()).toBe(null);
 

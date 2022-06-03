@@ -1,5 +1,5 @@
 import type { MethodFunction } from "./serverless";
-import type { DbaUser } from "./DataBaseAdapter";
+import type { DbaUser } from "./DatabaseAdapter";
 
 const methods: Record<string, MethodFunction> = {
   echo(query) {
