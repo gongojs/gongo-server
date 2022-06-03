@@ -27,15 +27,19 @@ describe("express", () => {
     );
   }
 
-  it("sends HTTP 400 Bad Request on non-json", async () => {
+  it("sends HTTP 400 Bad Request on non-arson", async () => {
+    gs._supressConsoleErrors = true;
     const response = await request(app).post("/").type("form").send("text");
     expect(response.statusCode).toBe(400);
+    gs._supressConsoleErrors = false;
   });
 
   it("sends HTTP 400 Bad Request on no $gongo in request object", async () => {
-    const query = {};
-    const response = await request(app).post("/").send(query);
+    gs._supressConsoleErrors = true;
+    const query = { noGongo: true };
+    const response = await request(app).post("/").send(gs.ARSON.encode(query));
     expect(response.statusCode).toBe(400);
+    gs._supressConsoleErrors = false;
   });
 
   it("sends error on version mismatch", async () => {

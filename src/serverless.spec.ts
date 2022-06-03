@@ -34,6 +34,7 @@ describe("GongoServerless2", () => {
 
     it("handles thrown errors", async () => {
       const gs = new GongoServerless();
+      gs._supressConsoleErrors = true;
       gs.method("error", () => {
         throw new Error("My Error");
       });
@@ -47,6 +48,7 @@ describe("GongoServerless2", () => {
 
     it("handles thrown non-errors", async () => {
       const gs = new GongoServerless();
+      gs._supressConsoleErrors = true;
       gs.method("error", () => {
         throw "string error";
       });

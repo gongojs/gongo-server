@@ -35,6 +35,7 @@ export default class GongoServerless {
   _publications = publications;
   publish = publish;
   ARSON = ARSON;
+  _supressConsoleErrors = false;
 
   constructor({ dba }: { dba?: DataBaseAdapter } = {}) {
     this.dba = dba;
@@ -89,8 +90,10 @@ export default class GongoServerless {
           },
         };
       }
-      console.error(`Error in ${name}(${JSON.stringify(query)}):`);
-      console.error(error);
+      if (!this._supressConsoleErrors) {
+        console.error(`Error in ${name}(${JSON.stringify(query)}):`);
+        console.error(error);
+      }
     }
     out.time = Date.now() - start;
 

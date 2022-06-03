@@ -14,13 +14,15 @@ export async function GSExpressPost(
   try {
     query = this.ARSON.decode(req.body);
   } catch (error) {
-    console.error("Error decoding: " + req.body);
-    console.error(error);
+    if (!this._supressConsoleErrors) {
+      console.error("Error decoding: " + JSON.stringify(req.body));
+      console.error(error);
+    }
     res.status(400).send("Bad Request");
     res.end();
     return;
   }
-  console.log(query);
+  //console.log(query);
 
   if (!query.$gongo) {
     //res.sendStatus(400); // not available in vercel
@@ -64,7 +66,7 @@ export async function GSExpressPost(
     );
 
   // console.log(req.body);
-  console.log(out);
+  // console.log(out);
   //res.json(out);
 
   res.setHeader("Content-Type", "text/plain; charset=utf-8");

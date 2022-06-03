@@ -6,11 +6,28 @@ export interface CollectionResults {
   entries: Array<Record<string, unknown>>;
 }
 
+export interface UpdateRange {
+  coll: string;
+  from: number;
+  to: number;
+}
+
+export interface ResultMeta {
+  size: number;
+  updateRanges: Array<UpdateRange>;
+  url: string;
+}
+
 export interface PublicationResults {
   results?: Array<CollectionResults>;
+  resultsMeta?: ResultMeta;
 }
 
 export type UpdatedAt = Record<string, number>;
+
+export interface PublicationProps extends MethodProps {
+  updatedAt: UpdatedAt;
+}
 
 export type PublicationFunction = (
   db: DataBaseAdapter,
@@ -28,6 +45,7 @@ export function publish(name: string, func: PublicationFunction): void {
   publications.set(name, func);
 }
 
+// gs.method("subscribe", subscribeMethod);
 export async function subscribeMethod(
   {
     name,
@@ -39,7 +57,9 @@ export async function subscribeMethod(
   const publication = publications.get(name);
   if (!publication) throw new Error("No such publication: " + name);
 
-  let results = await publication(props.dba, opts, props);
+  const publicationProps: PublicationProps = { ...props, updatedAt };
+
+  let results = await publication(props.dba, opts, publicationProps);
 
   // new: not yet implemeted
   //results = await props.dba.publishHelper(results);
