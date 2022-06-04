@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@types/passport": "^1.0.8",
+    "@types/passport-oauth2": "^1.4.11",
     "arson": "^0.2.6",
     "bcrypt": "^5.0.1"
   },

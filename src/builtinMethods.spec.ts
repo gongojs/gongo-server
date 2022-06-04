@@ -34,8 +34,8 @@ describe("builtinMethods", () => {
     it("returns userId of real user", async () => {
       const props: MethodProps = {
         dba: {
-          // @ts-expect-error: stub
           Users: {
+            // @ts-expect-error: stub
             getUserWithEmailAndPassword: () => Promise.resolve({ _id: "id" }),
           },
         },
@@ -63,8 +63,8 @@ describe("builtinMethods", () => {
 
       const props: MethodProps = {
         dba: {
-          // @ts-expect-error: stub
           Users: {
+            // @ts-expect-error: stub
             getUserWithEmailAndPassword: () => Promise.resolve({ _id: userId }),
           },
         },

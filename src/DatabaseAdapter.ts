@@ -2,6 +2,9 @@ import type { PublicationProps, PublicationResults } from "./publications";
 import type { MethodProps } from "./serverless";
 import type GongoServerless from "./serverless";
 import type { Operation } from "fast-json-patch/module/core.js";
+export type { Operation } from "fast-json-patch/module/core.js";
+import type { Profile } from "passport";
+export type { Profile } from "passport";
 
 interface InstanceWithToStringMethod {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,12 +23,13 @@ export interface DbaUser {
 
 export interface DbaUserEmail {
   value: string;
+  type?: string | undefined;
 }
 
 export interface DbaUserService {
   service: string;
   id: string;
-  profile: Record<string, unknown>;
+  profile: Profile;
   accessToken: string;
   refreshToken: string;
 }
@@ -33,6 +37,14 @@ export interface DbaUserService {
 export interface DbaUsers {
   createUser(
     callback: (dbaUser: Partial<DbaUser>) => Partial<DbaUser>
+  ): Promise<DbaUser>;
+  findOrCreateService(
+    email: string | Array<DbaUserEmail> | undefined,
+    service: string,
+    id: string,
+    profile: Profile,
+    accessToken: string,
+    refreshToken: string
   ): Promise<DbaUser>;
   setSessionData(sid: string, data: Record<string, unknown>): Promise<void>;
   getSessionData(sid: string): Promise<Record<string, unknown>>;

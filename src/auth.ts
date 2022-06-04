@@ -1,7 +1,12 @@
 //const { debounce } = require("./utils");
-import type GongoServerless from "./serverless.js";
+import type { Request, Response } from "express";
+import type { Authenticator, Profile, Strategy } from "passport";
+import type OAuth2Strategy from "passport-oauth2";
+import type { VerifyCallback } from "passport-oauth2";
+
 import type DatabaseAdapter from "./DatabaseAdapter.js";
-import type { Authenticator, Strategy } from "passport";
+import type { DbaUser } from "./DatabaseAdapter.js";
+import type GongoServerless from "./serverless.js";
 
 export interface StrategyData {
   _id: string;
@@ -25,7 +30,7 @@ export default class GongoAuth {
   gongoServer: GongoServerless;
   passport: Authenticator;
   dba?: DatabaseAdapter;
-  strategyData: Array<StrategyData>;
+  strategyData: Array<StrategyData | OAuth2StrategyData>;
 
   constructor(gongoServer: GongoServerless, passport: Authenticator) {
     this.gongoServer = gongoServer;
@@ -63,15 +68,26 @@ export default class GongoAuth {
     this.ensureDbStrategyData = () => Promise.resolve();
   }
 
-  passportVerify(req, accessToken, refreshToken, profile, cb) {
+  // TODO, rename to passportOauth2Verify or check for OAuth2 class...
+  passportVerify(
+    req: Request,
+    accessToken: string,
+    refreshToken: string,
+    profile: Profile,
+    cb: VerifyCallback
+  ) {
+    if (typeof req.query.state !== "string")
+      throw new Error("passportVerify(), typeof req.query.state !== 'string'");
+
     const state = JSON.parse(req.query.state);
     // console.log(this); // gongoAuth (has gongoAuth.gongoServer)
     // console.log(state); // { sessionId, service: 'google' };
     // 'google' also in profile.provider
     // console.log(profile);
 
-    const db = this.gongoServer.db;
-    db.Users.findOrCreateService(
+    if (!this.dba) throw new Error("passportVerify(), this.dba not defined");
+
+    this.dba.Users.findOrCreateService(
       profile.emails,
       profile.provider,
       profile.id,
@@ -82,9 +98,11 @@ export default class GongoAuth {
       .then((user) => {
         let ip;
         if (req.headers["x-forwarded-for"]) {
-          ip = req.headers["x-forwarded-for"].split(",")[0].trim();
+          if (typeof req.headers["x-forwarded-for"] === "string")
+            ip = req.headers["x-forwarded-for"].split(",")[0].trim();
+          else ip = req.headers["x-forwarded-for"][0];
         } else {
-          ip = req.connection.remoteAddress;
+          ip = (req.socket || req.connection).remoteAddress;
         }
 
         const data = {
@@ -92,7 +110,9 @@ export default class GongoAuth {
           userAgent: req.headers["user-agent"],
           ip,
         };
-        db.Users.setSessionData(state.sessionId, data);
+        if (!this.dba)
+          throw new Error("passportVerify(), this.dba not defined");
+        this.dba.Users.setSessionData(state.sessionId, data);
 
         cb(null, user);
       })
@@ -103,11 +123,17 @@ export default class GongoAuth {
     //});
   }
 
-  boundPassportComplete(req, res) {
+  boundPassportComplete(req: Request, res: Response) {
     return this.passportComplete.bind(this, req, res);
   }
 
-  passportComplete(req, res, err, user, info) {
+  passportComplete(
+    req: Request,
+    res: Response,
+    err: unknown,
+    user: DbaUser,
+    info: unknown
+  ) {
     console.log(
       'WARNING, DEVEL TARGET_ORIGIN SET TO "*" IN GONGO-SERVER/AUTH.JS'
     );
@@ -128,27 +154,34 @@ export default class GongoAuth {
     );
   }
 
-  use(strategy, extra = {}) {
-    if (strategy._oauth2) {
+  use(strategy: Strategy | OAuth2Strategy, extra = {}) {
+    if ("_oauth2" in strategy) {
       console.log("Found oauth2 strategy " + strategy.name);
 
+      // @ts-expect-error: uhhh...
       if (!strategy._passReqToCallback)
         throw new Error(
           "oauth2 strategy initiated without passReqToCallback: true"
         );
 
+      // @ts-expect-error: strictly speaking it's protected
       const oauth2 = strategy._oauth2;
 
       this.strategyData.push({
-        _id: strategy._key,
-        name: strategy.name,
+        // @ts-expect-error: yeah we shouldn't really be using this
+        _id: strategy._key as string,
+        name: strategy.name as string,
         type: "oauth2",
         oauth2: {
+          // @ts-expect-error: strictly speaking it's protected
           authorize_url: oauth2._authorizeUrl,
+          // @ts-expect-error: strictly speaking it's protected
           client_id: oauth2._clientId,
+          // @ts-expect-error: strictly speaking it's protected
           redirect_uri: strategy._callbackURL,
           response_type: "code",
-          scope: extra.scope,
+          // @ts-expect-error: strictly speaking it's protected
+          scope: extra.scope as string,
         },
       });
     } else {
@@ -162,7 +195,9 @@ export default class GongoAuth {
     //this.ensureDbStrategyData();
   }
 
+  /*
   addPassport(passport) {
     Object.values(passport._strategies).forEach((strategy) => {});
   }
+  */
 }
