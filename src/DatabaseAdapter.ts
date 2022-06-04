@@ -35,9 +35,7 @@ export interface DbaUserService {
 }
 
 export interface DbaUsers {
-  createUser(
-    callback: (dbaUser: Partial<DbaUser>) => Partial<DbaUser>
-  ): Promise<DbaUser>;
+  createUser(callback: (dbaUser: Partial<DbaUser>) => void): Promise<DbaUser>;
   findOrCreateService(
     email: string | Array<DbaUserEmail> | undefined,
     service: string,
