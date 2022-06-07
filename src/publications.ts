@@ -32,12 +32,20 @@ export interface PublicationProps<DBA extends DatabaseAdapter>
   updatedAt: UpdatedAt;
 }
 
+type TypeOfFirstArg<T> = T extends (
+  first: infer FirstArg,
+  ...args: any[]
+) => any
+  ? FirstArg
+  : never;
+
 export type PublicationFunction<DBA extends DatabaseAdapter> = (
   db: DBA,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   query: any,
   props: MethodProps<DBA>
-) => Promise<PublicationResults> | any /* cursor */;
+  //) => Promise<PublicationResults> | any /* cursor */;
+) => Promise<PublicationResults> | TypeOfFirstArg<DBA["publishHelper"]>;
 
 export type Publications<DBA extends DatabaseAdapter> = Map<
   string,
