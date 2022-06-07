@@ -1,16 +1,18 @@
 import type { MethodFunction } from "./serverless";
+import DatabaseAdapter from "./DatabaseAdapter";
 import type { DbaUser } from "./DatabaseAdapter";
 
 const methods: Record<string, MethodFunction> = {
-  echo(query) {
+  echo(db, query) {
     return query;
   },
 
   async loginWithPassword(
+    db: DatabaseAdapter,
     { email, password }: { email: string; password: string },
-    { dba, req, auth }
+    { req, auth }
   ): Promise<string | null> {
-    const user: DbaUser | null = await dba.Users.getUserWithEmailAndPassword(
+    const user: DbaUser | null = await db.Users.getUserWithEmailAndPassword(
       email,
       password
     );
@@ -31,7 +33,7 @@ const methods: Record<string, MethodFunction> = {
     const sid = await auth.sid();
     if (sid) {
       const data = { userId, userAgent: req.headers["user-agent"], ip };
-      dba.Users.setSessionData(sid, data);
+      db.Users.setSessionData(sid, data);
     }
 
     //return { userId };

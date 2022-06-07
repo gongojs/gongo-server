@@ -48,6 +48,7 @@ export function publish(name: string, func: PublicationFunction): void {
 
 // gs.method("subscribe", subscribeMethod);
 export async function subscribeMethod(
+  db: DatabaseAdapter,
   {
     name,
     updatedAt,

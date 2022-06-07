@@ -26,8 +26,12 @@ export interface MethodResult {
   time?: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type MethodFunction = (query: any, props: MethodProps) => unknown;
+export type MethodFunction = (
+  db: DatabaseAdapter,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: any,
+  props: MethodProps
+) => unknown;
 
 export default class GongoServerless {
   methods: Map<string, MethodFunction>;
@@ -41,7 +45,7 @@ export default class GongoServerless {
     this.dba = dba;
     this.methods = new Map(Object.entries(builtinMethods));
     this.method("subscribe", subscribeMethod);
-    this.method("changeSet", async (query, props) => {
+    this.method("changeSet", async (db, query, props) => {
       // TODO, v2 dba
       console.log(query);
       return dba && dba.processChangeSet(query, props);
@@ -72,7 +76,7 @@ export default class GongoServerless {
 
     try {
       out = {
-        $result: await method(query, props),
+        $result: await method(props.dba, query, props),
       };
     } catch (error) {
       if (error instanceof Error) {

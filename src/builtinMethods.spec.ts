@@ -6,7 +6,7 @@ describe("builtinMethods", () => {
     it("returns query", () => {
       const query = { a: 1, b: 2 };
       // @ts-expect-error: stub
-      expect(methods.echo(query, {})).toEqual(query);
+      expect(methods.echo({}, query, {})).toEqual(query);
     });
   });
 
@@ -18,7 +18,7 @@ describe("builtinMethods", () => {
       const props: MethodProps = { dba: { Users: {} } };
 
       props.dba.Users.getUserWithEmailAndPassword = () => Promise.resolve(null);
-      expect(loginWithPassword({}, props)).resolves.toBe(null);
+      expect(loginWithPassword(props.dba, {}, props)).resolves.toBe(null);
 
       /*
       props.dba.Users.getUserWithEmailAndPassword = () =>
@@ -49,7 +49,7 @@ describe("builtinMethods", () => {
         },
       };
 
-      expect(await loginWithPassword({}, props)).toBe("id");
+      expect(await loginWithPassword(props.dba, {}, props)).toBe("id");
     });
 
     // for e.g. MongoObjectIDs.
@@ -78,7 +78,7 @@ describe("builtinMethods", () => {
         },
       };
 
-      expect(await loginWithPassword({}, props)).toBe("id");
+      expect(await loginWithPassword(props.dba, {}, props)).toBe("id");
     });
 
     it("set sessionData with userId, userAgent, ip", async () => {
@@ -100,7 +100,7 @@ describe("builtinMethods", () => {
       // @ts-expect-error: stub
       const props: MethodProps = { dba, auth, req };
 
-      await loginWithPassword({}, props);
+      await loginWithPassword(props.dba, {}, props);
 
       expect(setSessionData).toHaveBeenCalledWith("sid", {
         ip: req.socket.remoteAddress,
@@ -133,7 +133,7 @@ describe("builtinMethods", () => {
       // @ts-expect-error: stub
       const props: MethodProps = { dba, auth, req };
 
-      await loginWithPassword({}, props);
+      await loginWithPassword(props.dba, {}, props);
 
       expect(setSessionData).toHaveBeenCalledWith("sid", {
         ip: "2.2.2.2",
