@@ -26,13 +26,13 @@ export interface OAuth2StrategyData extends StrategyData {
   };
 }
 
-export default class GongoAuth {
-  gongoServer: GongoServerless;
+export default class GongoAuth<DBA extends DatabaseAdapter> {
+  gongoServer: GongoServerless<DBA>;
   passport: Authenticator;
-  dba?: DatabaseAdapter;
+  dba?: DBA;
   strategyData: Array<StrategyData | OAuth2StrategyData>;
 
-  constructor(gongoServer: GongoServerless, passport: Authenticator) {
+  constructor(gongoServer: GongoServerless<DBA>, passport: Authenticator) {
     this.gongoServer = gongoServer;
     this.passport = passport;
     this.dba = gongoServer.dba;

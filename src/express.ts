@@ -1,10 +1,11 @@
 import type { Request, RequestHandler, Response } from "express";
 import type GongoServerless from "./serverless";
 import type { MethodProps, MethodResult } from "./serverless";
+import type DatabaseAdapter from "./DatabaseAdapter";
 import Auth from "./auth-class";
 
-export async function GSExpressPost(
-  this: GongoServerless,
+export async function GSExpressPost<DBA extends DatabaseAdapter>(
+  this: GongoServerless<DBA>,
   req: Request,
   res: Response
 ): Promise<void> {
@@ -44,7 +45,7 @@ export async function GSExpressPost(
     return;
   }
 
-  const props: MethodProps = {
+  const props: MethodProps<DBA> = {
     gs: this,
     req: req,
     // @ts-expect-error: think more how to handle this TODO

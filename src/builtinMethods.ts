@@ -1,3 +1,4 @@
+/*
 import type { MethodFunction } from "./serverless";
 import DatabaseAdapter from "./DatabaseAdapter";
 import type { DbaUser } from "./DatabaseAdapter";
@@ -42,3 +43,4 @@ const methods: Record<string, MethodFunction> = {
 };
 
 export default methods;
+*/

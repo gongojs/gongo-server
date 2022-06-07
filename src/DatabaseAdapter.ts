@@ -76,18 +76,18 @@ export interface ChangeSetResults {
 }
 
 export default interface DatabaseAdapter {
-  gs?: GongoServerless;
-  onInit(gs: GongoServerless): void;
+  gs?: GongoServerless<this>;
+  onInit(gs: GongoServerless<this>): void;
   Users: DbaUsers;
 
   publishHelper(
     // eslint-disable-next-line
     results: any,
-    props: PublicationProps
+    props: PublicationProps<this>
   ): Promise<PublicationResults>;
 
   processChangeSet(
     changeSet: ChangeSet,
-    props: MethodProps
+    props: MethodProps<this>
   ): Promise<ChangeSetResults>;
 }

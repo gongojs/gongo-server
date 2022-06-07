@@ -1,10 +1,10 @@
 import type DatabaseAdapter from "./DatabaseAdapter";
 
-export default class Auth {
-  dba: DatabaseAdapter;
+export default class Auth<DBA extends DatabaseAdapter> {
+  dba: DBA;
   untrusted: Record<string, unknown>;
 
-  constructor(dba: DatabaseAdapter, untrusted?: Record<string, unknown>) {
+  constructor(dba: DBA, untrusted?: Record<string, unknown>) {
     this.dba = dba;
     this.untrusted = untrusted || {};
   }

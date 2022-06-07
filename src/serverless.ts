@@ -1,17 +1,18 @@
 import type Auth from "./auth-class";
 import type DatabaseAdapter from "./DatabaseAdapter";
 import type { Request, RequestHandler } from "express";
-import { publications, publish, subscribeMethod } from "./publications";
+import { publish, subscribeMethod } from "./publications";
+import type { Publications } from "./publications";
 import { GSExpressPost } from "./express";
-import builtinMethods from "./builtinMethods";
+// import builtinMethods from "./builtinMethods"; XXX
 //import ARSON from "arson";
 const ARSON = require("arson");
 
-export interface MethodProps {
-  gs: GongoServerless;
-  auth: Auth;
+export interface MethodProps<DBA extends DatabaseAdapter> {
+  gs: GongoServerless<DBA>;
+  auth: Auth<DBA>;
   req: Request;
-  dba: DatabaseAdapter;
+  dba: DBA;
 }
 
 export interface ErrorObject {
@@ -26,35 +27,36 @@ export interface MethodResult {
   time?: number;
 }
 
-export type MethodFunction = (
-  db: DatabaseAdapter,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type MethodFunction<DBA extends DatabaseAdapter> = (
+  db: DBA,
   query: any,
-  props: MethodProps
+  props: MethodProps<DBA>
 ) => unknown;
 
-export default class GongoServerless {
-  methods: Map<string, MethodFunction>;
-  dba?: DatabaseAdapter;
-  _publications = publications;
-  publish = publish;
+export default class GongoServerless<DBA extends DatabaseAdapter> {
+  methods: Map<string, MethodFunction<DBA>>;
+  dba?: DBA;
+  _publications: Publications<DBA> = new Map();
+  publish = publish<DBA>.bind(this);
   ARSON = ARSON;
   _supressConsoleErrors = false;
 
-  constructor({ dba }: { dba?: DatabaseAdapter } = {}) {
+  constructor({ dba }: { dba?: DBA } = {}) {
     this.dba = dba;
-    this.methods = new Map(Object.entries(builtinMethods));
-    this.method("subscribe", subscribeMethod);
+    //this.methods = new Map(Object.entries(builtinMethods));
+    this.methods = new Map();
+    this.method("subscribe", subscribeMethod<DBA>.bind(this));
     this.method("changeSet", async (db, query, props) => {
       // TODO, v2 dba
       console.log(query);
       return dba && dba.processChangeSet(query, props);
     });
-
+    
     if (dba && dba.onInit) dba.onInit(this);
   }
 
-  method(name: string, func: MethodFunction) {
+  method(name: string, func: MethodFunction<DBA>) {
     if (this.methods.has(name))
       throw new Error(`Method "${name}" already exists`);
 
@@ -65,7 +67,7 @@ export default class GongoServerless {
     name: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query: any,
-    props: MethodProps
+    props: MethodProps<DBA>
   ): Promise<MethodResult> {
     const method = this.methods.get(name);
 
@@ -105,6 +107,6 @@ export default class GongoServerless {
   }
 
   expressPost(): RequestHandler {
-    return GSExpressPost.bind(this);
+    return GSExpressPost<DBA>.bind(this);
   }
 }
