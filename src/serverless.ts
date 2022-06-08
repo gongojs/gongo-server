@@ -71,7 +71,15 @@ export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
   ): Promise<MethodResult> {
     const method = this.methods.get(name);
 
-    if (!method) throw new Error(`Method "${name}" does not exist`);
+    if (!method) {
+      return {
+        $error: {
+          name: "NonExistantMethodError",
+          message: `Method "${name}" does not exist`,
+        },
+        time: 0,
+      }
+    }
 
     let out: MethodResult;
     const start = Date.now();
