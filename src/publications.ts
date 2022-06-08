@@ -7,6 +7,8 @@ export interface CollectionResults {
   entries: Array<Record<string, unknown>>;
 }
 
+export type PublicationResult = CollectionResults[];
+
 export interface UpdateRange {
   coll: string;
   from: number;
@@ -19,8 +21,8 @@ export interface ResultMeta {
   url: string;
 }
 
-export interface PublicationResults {
-  results?: Array<CollectionResults>;
+export interface PublicationResponse {
+  results?: PublicationResult;
   resultsMeta?: ResultMeta;
 }
 
@@ -45,7 +47,7 @@ export type PublicationFunction<DBA extends DatabaseAdapter<DBA>> = (
   query: any,
   props: MethodProps<DBA>
   //) => Promise<PublicationResults> | any /* cursor */;
-) => Promise<PublicationResults> | TypeOfFirstArg<DBA["publishHelper"]>;
+) => Promise<PublicationResult> | TypeOfFirstArg<DBA["publishHelper"]>;
 
 export type Publications<DBA extends DatabaseAdapter<DBA>> = Map<
   string,
@@ -76,7 +78,7 @@ export async function subscribeMethod<DBA extends DatabaseAdapter<DBA>>(
     opts,
   }: { name: string; updatedAt: UpdatedAt; opts: Record<string, unknown> },
   props: MethodProps<DBA>
-) {
+): Promise<PublicationResponse> {
   const publication = this._publications.get(name);
   if (!publication) throw new Error("No such publication: " + name);
 
@@ -94,5 +96,8 @@ export async function subscribeMethod<DBA extends DatabaseAdapter<DBA>>(
   );
   */
 
-  return results;
+  return {
+    results,
+    // resultsMeta
+  };
 }

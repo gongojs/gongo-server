@@ -1,11 +1,7 @@
 import { publish, subscribeMethod } from "./publications";
 import type GongoServerless from "./serverless";
 
-import type {
-  Publications,
-  PublicationFunction,
-  PublicationResults,
-} from "./publications";
+import type { Publications, PublicationFunction } from "./publications";
 
 // @ts-expect-error: test stub
 const test: {
@@ -61,7 +57,9 @@ describe("publications", () => {
         { name: "echo", opts: "opts" },
         props
       );
-      expect(result).toBe("opts (helped)");
+      expect(result).toMatchObject({
+        results: "opts (helped)",
+      });
     });
   });
 });

@@ -1,4 +1,4 @@
-import type { PublicationProps, PublicationResults } from "./publications";
+import type { PublicationProps, PublicationResult } from "./publications";
 import type { MethodProps } from "./serverless";
 import type GongoServerless from "./serverless";
 import type { Operation } from "fast-json-patch/module/core.js";
@@ -84,7 +84,7 @@ export default interface DatabaseAdapter<DBA extends DatabaseAdapter<DBA>> {
     // eslint-disable-next-line
     results: any,
     props: PublicationProps<DBA>
-  ): Promise<PublicationResults>;
+  ): Promise<PublicationResult>;
 
   processChangeSet(
     changeSet: ChangeSet,
