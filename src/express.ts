@@ -4,7 +4,7 @@ import type { MethodProps, MethodResult } from "./serverless";
 import type DatabaseAdapter from "./DatabaseAdapter";
 import Auth from "./auth-class";
 
-export async function GSExpressPost<DBA extends DatabaseAdapter>(
+export async function GSExpressPost<DBA extends DatabaseAdapter<DBA>>(
   this: GongoServerless<DBA>,
   req: Request,
   res: Response

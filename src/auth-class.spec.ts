@@ -12,7 +12,8 @@ describe("Auth", () => {
   });
 
   it("sid", async () => {
-    const dba = {} as DatabaseAdapter;
+    const dba = {};
+    // @ts-expect-error: stub
     const auth = new Auth(dba, {});
     expect(await auth.sid()).toBe(null);
 

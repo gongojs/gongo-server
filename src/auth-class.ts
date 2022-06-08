@@ -1,6 +1,6 @@
 import type DatabaseAdapter from "./DatabaseAdapter";
 
-export default class Auth<DBA extends DatabaseAdapter> {
+export default class Auth<DBA extends DatabaseAdapter<DBA>> {
   dba: DBA;
   untrusted: Record<string, unknown>;
 

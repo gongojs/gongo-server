@@ -26,7 +26,7 @@ export interface OAuth2StrategyData extends StrategyData {
   };
 }
 
-export default class GongoAuth<DBA extends DatabaseAdapter> {
+export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
   gongoServer: GongoServerless<DBA>;
   passport: Authenticator;
   dba?: DBA;

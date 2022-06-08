@@ -75,19 +75,19 @@ export interface ChangeSetResults {
   $errors?: Array<ChangeSetError>;
 }
 
-export default interface DatabaseAdapter {
-  gs?: GongoServerless<this>;
-  onInit(gs: GongoServerless<this>): void;
+export default interface DatabaseAdapter<DBA extends DatabaseAdapter<DBA>> {
+  gs?: GongoServerless<DBA>;
+  onInit(gs: GongoServerless<DBA>): void;
   Users: DbaUsers;
 
   publishHelper(
     // eslint-disable-next-line
     results: any,
-    props: PublicationProps<this>
+    props: PublicationProps<DBA>
   ): Promise<PublicationResults>;
 
   processChangeSet(
     changeSet: ChangeSet,
-    props: MethodProps<this>
+    props: MethodProps<DBA>
   ): Promise<ChangeSetResults>;
 }

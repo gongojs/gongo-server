@@ -26,7 +26,7 @@ export interface PublicationResults {
 
 export type UpdatedAt = Record<string, number>;
 
-export interface PublicationProps<DBA extends DatabaseAdapter>
+export interface PublicationProps<DBA extends DatabaseAdapter<DBA>>
   extends MethodProps<DBA> {
   name: string;
   updatedAt: UpdatedAt;
@@ -39,7 +39,7 @@ type TypeOfFirstArg<T> = T extends (
   ? FirstArg
   : never;
 
-export type PublicationFunction<DBA extends DatabaseAdapter> = (
+export type PublicationFunction<DBA extends DatabaseAdapter<DBA>> = (
   db: DBA,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   query: any,
@@ -47,7 +47,7 @@ export type PublicationFunction<DBA extends DatabaseAdapter> = (
   //) => Promise<PublicationResults> | any /* cursor */;
 ) => Promise<PublicationResults> | TypeOfFirstArg<DBA["publishHelper"]>;
 
-export type Publications<DBA extends DatabaseAdapter> = Map<
+export type Publications<DBA extends DatabaseAdapter<DBA>> = Map<
   string,
   PublicationFunction<DBA>
 >;
@@ -55,7 +55,7 @@ export type Publications<DBA extends DatabaseAdapter> = Map<
 // export const publications: Publications = new Map();
 //export const publications: Map<string, PublicationFunction> = new Map();
 
-export function publish<DBA extends DatabaseAdapter>(
+export function publish<DBA extends DatabaseAdapter<DBA>>(
   this: GongoServerless<DBA>,
   name: string,
   func: PublicationFunction<DBA>
@@ -67,7 +67,7 @@ export function publish<DBA extends DatabaseAdapter>(
 }
 
 // gs.method("subscribe", subscribeMethod);
-export async function subscribeMethod<DBA extends DatabaseAdapter>(
+export async function subscribeMethod<DBA extends DatabaseAdapter<DBA>>(
   this: GongoServerless<DBA>,
   db: DBA,
   {

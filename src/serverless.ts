@@ -8,7 +8,7 @@ import { GSExpressPost } from "./express";
 //import ARSON from "arson";
 const ARSON = require("arson");
 
-export interface MethodProps<DBA extends DatabaseAdapter> {
+export interface MethodProps<DBA extends DatabaseAdapter<DBA>> {
   gs: GongoServerless<DBA>;
   auth: Auth<DBA>;
   req: Request;
@@ -28,13 +28,13 @@ export interface MethodResult {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type MethodFunction<DBA extends DatabaseAdapter> = (
+export type MethodFunction<DBA extends DatabaseAdapter<DBA>> = (
   db: DBA,
   query: any,
   props: MethodProps<DBA>
 ) => unknown;
 
-export default class GongoServerless<DBA extends DatabaseAdapter> {
+export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
   methods: Map<string, MethodFunction<DBA>>;
   dba?: DBA;
   _publications: Publications<DBA> = new Map();
