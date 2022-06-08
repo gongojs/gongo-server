@@ -8,11 +8,16 @@ describe("GongoServerless2", () => {
       expect(() => gs.method("test", () => null)).toThrow(/already exists/);
     });
 
-    it("throws on missing method", () => {
+    it("throws on missing method", async () => {
       const gs = new GongoServerless();
       gs.method("null", () => null);
       // @ts-expect-error: stub
-      expect(gs._methodExec("404", {}, {})).rejects.toThrow(/does not exist/);
+      const result = await gs._methodExec("404", {}, {});
+      expect(result).toMatchObject({
+        $error: {
+          message: /does not exist/,
+        },
+      });
     });
 
     it("returns methodfunc result", async () => {

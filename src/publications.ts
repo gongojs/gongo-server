@@ -56,7 +56,7 @@ export type Publications<DBA extends DatabaseAdapter<DBA>> = Map<
 //export const publications: Map<string, PublicationFunction> = new Map();
 
 export function publish<DBA extends DatabaseAdapter<DBA>>(
-  this: GongoServerless<DBA>,
+  this: { [key: string]: any; _publications: Publications<DBA> },
   name: string,
   func: PublicationFunction<DBA>
 ): void {
