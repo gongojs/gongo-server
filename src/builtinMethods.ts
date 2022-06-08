@@ -1,15 +1,14 @@
-/*
-import type { MethodFunction } from "./serverless";
+import type { MethodFunction, MethodProps } from "./serverless";
 import DatabaseAdapter from "./DatabaseAdapter";
 import type { DbaUser } from "./DatabaseAdapter";
 
-const methods: Record<string, MethodFunction> = {
+const methods: Record<string, MethodFunction<any>> = {
   echo(db, query) {
     return query;
   },
 
   async loginWithPassword(
-    db: DatabaseAdapter,
+    db: DatabaseAdapter<any>,
     { email, password }: { email: string; password: string },
     { req, auth }
   ): Promise<string | null> {
@@ -43,4 +42,3 @@ const methods: Record<string, MethodFunction> = {
 };
 
 export default methods;
-*/

@@ -4,7 +4,7 @@ import type { Request, RequestHandler } from "express";
 import { publish, subscribeMethod } from "./publications";
 import type { Publications } from "./publications";
 import { GSExpressPost } from "./express";
-// import builtinMethods from "./builtinMethods"; XXX
+import builtinMethods from "./builtinMethods";
 //import ARSON from "arson";
 const ARSON = require("arson");
 
@@ -44,8 +44,7 @@ export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
 
   constructor({ dba }: { dba?: DBA } = {}) {
     this.dba = dba;
-    //this.methods = new Map(Object.entries(builtinMethods));
-    this.methods = new Map();
+    this.methods = new Map(Object.entries(builtinMethods));
     this.method("subscribe", subscribeMethod<DBA>.bind(this));
     this.method("changeSet", async (db, query, props) => {
       // TODO, v2 dba
