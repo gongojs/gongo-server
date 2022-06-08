@@ -47,7 +47,10 @@ export type PublicationFunction<DBA extends DatabaseAdapter<DBA>> = (
   query: any,
   props: MethodProps<DBA>
   //) => Promise<PublicationResults> | any /* cursor */;
-) => Promise<PublicationResult> | TypeOfFirstArg<DBA["publishHelper"]>;
+) =>
+  | Promise<PublicationResult>
+  | TypeOfFirstArg<DBA["publishHelper"]>
+  | Promise<TypeOfFirstArg<DBA["publishHelper"]>>;
 
 export type Publications<DBA extends DatabaseAdapter<DBA>> = Map<
   string,
