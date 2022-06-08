@@ -1,4 +1,3 @@
-/*
 import methods from "./builtinMethods";
 import type { MethodProps } from "./serverless";
 
@@ -29,14 +28,13 @@ describe("builtinMethods", () => {
       props.dba.Users.getUserWithEmailAndPassword = () =>
         Promise.resolve(undefined);
       expect(loginWithPassword({}, props)).resolves.toBe(null);
-      */ /*
+      */
     });
 
     it("returns userId of real user", async () => {
-      const props: MethodProps = {
+      const props: MethodProps<any> = {
         dba: {
           Users: {
-            // @ts-expect-error: stub
             getUserWithEmailAndPassword: () => Promise.resolve({ _id: "id" }),
           },
         },
@@ -62,10 +60,9 @@ describe("builtinMethods", () => {
         },
       };
 
-      const props: MethodProps = {
+      const props: MethodProps<any> = {
         dba: {
           Users: {
-            // @ts-expect-error: stub
             getUserWithEmailAndPassword: () => Promise.resolve({ _id: userId }),
           },
         },
@@ -144,4 +141,3 @@ describe("builtinMethods", () => {
     });
   });
 });
-*/
