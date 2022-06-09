@@ -45,7 +45,7 @@ export type PublicationFunction<DBA extends DatabaseAdapter<DBA>> = (
   db: DBA,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   query: any,
-  props: MethodProps<DBA>
+  props: PublicationProps<DBA>
   //) => Promise<PublicationResults> | any /* cursor */;
 ) =>
   | Promise<PublicationResult>
