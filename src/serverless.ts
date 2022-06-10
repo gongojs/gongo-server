@@ -5,6 +5,7 @@ import { publish, subscribeMethod } from "./publications";
 import type { Publications } from "./publications";
 import { GSExpressPost } from "./express";
 import builtinMethods from "./builtinMethods";
+import { insert, update, remove } from "./crud";
 //import ARSON from "arson";
 const ARSON = require("arson");
 
@@ -51,6 +52,9 @@ export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
       console.log(query);
       return dba && dba.processChangeSet(query, props);
     });
+    this.method("insert", insert);
+    this.method("update", update);
+    this.method("remove", remove);
     
     if (dba && dba.onInit) dba.onInit(this);
   }

@@ -71,9 +71,22 @@ export type ChangeSetError = [
   error: Record<string, unknown>
 ];
 
-export interface ChangeSetResults {
-  $errors?: Array<ChangeSetError>;
+export interface ChangeSetCollectionOpResult {
+  success: string[];
+  failure: Array<[_id: string, error: Record<string, unknown>]>;
 }
+
+export interface ChangeSetCollectionResult {
+  insert?: ChangeSetCollectionOpResult;
+  update?: ChangeSetCollectionOpResult;
+  delete?: ChangeSetCollectionOpResult;
+}
+
+export interface ChangeSetResults {
+  [key: string]: ChangeSetCollectionResult;
+}
+
+export type OpError = [id: string, error: unknown][];
 
 export default interface DatabaseAdapter<DBA extends DatabaseAdapter<DBA>> {
   gs?: GongoServerless<DBA>;
@@ -90,4 +103,14 @@ export default interface DatabaseAdapter<DBA extends DatabaseAdapter<DBA>> {
     changeSet: ChangeSet,
     props: MethodProps<DBA>
   ): Promise<ChangeSetResults>;
+
+  insert(
+    collName: string,
+    docs: Array<Record<string, unknown>>
+  ): Promise<Array<OpError>>;
+  update(
+    collName: string,
+    updates: Array<ChangeSetUpdate>
+  ): Promise<Array<OpError>>;
+  remove(collName: string, ids: Array<string>): Promise<Array<OpError>>;
 }
