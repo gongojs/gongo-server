@@ -45,7 +45,7 @@ export interface DbaUsers {
     refreshToken: string
   ): Promise<DbaUser>;
   setSessionData(sid: string, data: Record<string, unknown>): Promise<void>;
-  getSessionData(sid: string): Promise<Record<string, unknown>>;
+  getSessionData(sid: string): Promise<Record<string, unknown> | null>;
   getUserWithEmailAndPassword(
     email: string,
     password: string
