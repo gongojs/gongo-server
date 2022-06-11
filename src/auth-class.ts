@@ -1,7 +1,10 @@
 import type DatabaseAdapter from "./DatabaseAdapter";
 import type { DbaUser } from "./DatabaseAdapter";
 
-export default class Auth<DBA extends DatabaseAdapter<DBA>> {
+export default class Auth<
+  DBA extends DatabaseAdapter<DBA>,
+  DBAU extends DbaUser
+> {
   dba: DBA;
   untrusted: Record<string, unknown>;
 
@@ -30,8 +33,11 @@ export default class Auth<DBA extends DatabaseAdapter<DBA>> {
     return await this.dba.Users.setSessionData(sid, data);
   }
 
-  async userId(): Promise<DbaUser["_id"] | null> {
+  async userId(): Promise<DBAU["_id"] | null> {
     const data = await this.getSessionData();
-    return data && (data.userId as DbaUser["_id"]);
+    return (
+      data &&
+      (data.userId as Awaited<ReturnType<DBA["Users"]["createUser"]>>["_id"])
+    );
   }
 }

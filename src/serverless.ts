@@ -11,7 +11,7 @@ const ARSON = require("arson");
 
 export interface MethodProps<DBA extends DatabaseAdapter<DBA>> {
   gs: GongoServerless<DBA>;
-  auth: Auth<DBA>;
+  auth: Auth<DBA, Awaited<ReturnType<DBA["Users"]["createUser"]>>>;
   req: Request;
   dba: DBA;
 }

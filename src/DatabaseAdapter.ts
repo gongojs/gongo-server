@@ -15,7 +15,8 @@ interface InstanceWithToStringMethod {
 export interface DbaUser {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
-  _id: string | InstanceWithToStringMethod;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _id: any; // subclass will override this
   emails: Array<DbaUserEmail>;
   services: Array<DbaUserService>;
   displayName?: string;
