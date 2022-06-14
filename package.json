@@ -44,8 +44,5 @@
     "prettier": "prettier -w src",
     "build": "tsc",
     "prepublishOnly": "yarn run build"
-  },
-  "engines": {
-    "node": ">=14.19.2"
   }
 }
