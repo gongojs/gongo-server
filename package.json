@@ -8,7 +8,8 @@
     "type": "git",
     "url": "https://github.com/gongojs/gongo-server"
   },
-  "main": "dist/index.js",
+  "main": "lib/serverless.js",
+  "types": "lib/serverless.d.ts",
   "keywords": [
     "database",
     "serverless",
