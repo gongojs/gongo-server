@@ -12,7 +12,7 @@ export async function insert<DBA extends DatabaseAdapter<DBA>>(
   // check allow() callbacks
   const allowedDocs = docs;
 
-  errors = errors.concat(await db.insert(coll, allowedDocs));
+  errors = errors.concat(await db.insert(coll, allowedDocs, props));
 
   return errors.length ? { $errors: errors } : {};
 }
@@ -27,7 +27,7 @@ export async function update<DBA extends DatabaseAdapter<DBA>>(
   // check allow() callbacks
   //const allowedDocs = docs;
 
-  errors = errors.concat(await db.update(coll, updates));
+  errors = errors.concat(await db.update(coll, updates, props));
 
   return errors.length ? { $errors: errors } : {};
 }
@@ -42,7 +42,7 @@ export async function remove<DBA extends DatabaseAdapter<DBA>>(
   // check allow() callbacks
   //const allowedDocs = docs;
 
-  errors = errors.concat(await db.remove(coll, ids));
+  errors = errors.concat(await db.remove(coll, ids, props));
 
   return errors.length ? { $errors: errors } : {};
 }

@@ -87,7 +87,7 @@ export interface ChangeSetResults {
   [key: string]: ChangeSetCollectionResult;
 }
 
-export type OpError = [id: string, error: unknown][];
+export type OpError = [id: string, error: unknown];
 
 export default interface DatabaseAdapter<DBA extends DatabaseAdapter<DBA>> {
   gs?: GongoServerless<DBA>;
@@ -100,18 +100,26 @@ export default interface DatabaseAdapter<DBA extends DatabaseAdapter<DBA>> {
     props: PublicationProps<DBA>
   ): Promise<PublicationResult>;
 
+  /*
   processChangeSet(
     changeSet: ChangeSet,
     props: MethodProps<DBA>
   ): Promise<ChangeSetResults>;
+  */
 
   insert(
     collName: string,
-    docs: Array<Record<string, unknown>>
+    docs: Array<Record<string, unknown>>,
+    props: MethodProps<DBA>
   ): Promise<Array<OpError>>;
   update(
     collName: string,
-    updates: Array<ChangeSetUpdate>
+    updates: Array<ChangeSetUpdate>,
+    props: MethodProps<DBA>
   ): Promise<Array<OpError>>;
-  remove(collName: string, ids: Array<string>): Promise<Array<OpError>>;
+  remove(
+    collName: string,
+    ids: Array<string>,
+    props: MethodProps<DBA>
+  ): Promise<Array<OpError>>;
 }

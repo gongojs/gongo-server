@@ -47,11 +47,13 @@ export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
     this.dba = dba;
     this.methods = new Map(Object.entries(builtinMethods));
     this.method("subscribe", subscribeMethod<DBA>.bind(this));
+    /*
     this.method("changeSet", async (db, query, props) => {
       // TODO, v2 dba
       console.log(query);
       return dba && dba.processChangeSet(query, props);
     });
+    */
     this.method("insert", insert);
     this.method("update", update);
     this.method("remove", remove);
