@@ -10,9 +10,10 @@ export async function insert<DBA extends DatabaseAdapter<DBA>>(
   let errors: Array<OpError> = [];
 
   // check allow() callbacks
-  const allowedDocs = docs;
+  const allowedDocs = await db.allowFilter(coll, "insert", docs, props, errors);
 
-  errors = errors.concat(await db.insert(coll, allowedDocs, props));
+  if (allowedDocs.length)
+    errors = errors.concat(await db.insert(coll, allowedDocs, props));
 
   return errors.length ? { $errors: errors } : {};
 }
@@ -25,9 +26,16 @@ export async function update<DBA extends DatabaseAdapter<DBA>>(
   let errors: Array<OpError> = [];
 
   // check allow() callbacks
-  //const allowedDocs = docs;
+  const allowedDocs = await db.allowFilter(
+    coll,
+    "update",
+    updates,
+    props,
+    errors
+  );
 
-  errors = errors.concat(await db.update(coll, updates, props));
+  if (allowedDocs.length)
+    errors = errors.concat(await db.update(coll, updates, props));
 
   return errors.length ? { $errors: errors } : {};
 }
@@ -40,9 +48,10 @@ export async function remove<DBA extends DatabaseAdapter<DBA>>(
   let errors: Array<OpError> = [];
 
   // check allow() callbacks
-  //const allowedDocs = docs;
+  const allowedDocs = await db.allowFilter(coll, "remove", ids, props, errors);
 
-  errors = errors.concat(await db.remove(coll, ids, props));
+  if (allowedDocs.length)
+    errors = errors.concat(await db.remove(coll, ids, props));
 
   return errors.length ? { $errors: errors } : {};
 }

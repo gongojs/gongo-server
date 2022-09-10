@@ -122,4 +122,38 @@ export default interface DatabaseAdapter<DBA extends DatabaseAdapter<DBA>> {
     ids: Array<string>,
     props: MethodProps<DBA>
   ): Promise<Array<OpError>>;
+
+  allowFilter(
+    collName: string,
+    operationName: "insert",
+    docs: Array<Record<string, unknown>>,
+    props: MethodProps<DBA>,
+    errors: Array<OpError>
+  ): Promise<Array<Record<string, unknown>>>;
+  allowFilter(
+    collName: string,
+    operationName: "update",
+    docs: Array<ChangeSetUpdate>,
+    props: MethodProps<DBA>,
+    errors: Array<OpError>
+  ): Promise<Array<ChangeSetUpdate>>;
+  allowFilter(
+    collName: string,
+    operationName: "remove",
+    docs: Array<string>,
+    props: MethodProps<DBA>,
+    errors: Array<OpError>
+  ): Promise<Array<string>>;
+  allowFilter(
+    collName: string,
+    operationName: "insert" | "update" | "remove",
+    docs:
+      | Array<Record<string, unknown>>
+      | Array<ChangeSetUpdate>
+      | Array<string>,
+    props: MethodProps<DBA>,
+    errors: Array<OpError>
+  ): Promise<
+    Array<Record<string, unknown>> | Array<ChangeSetUpdate> | Array<string>
+  >;
 }
