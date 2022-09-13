@@ -181,6 +181,7 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
           redirect_uri: strategy._callbackURL,
           response_type: "code",
           // @ts-expect-error: strictly speaking it's protected
+          // strategy._scope is new I think TODO, could be array too?  scopeSeparator.
           scope: extra.scope as string,
         },
       });
