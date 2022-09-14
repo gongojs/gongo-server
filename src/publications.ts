@@ -78,8 +78,8 @@ export async function subscribeMethod<DBA extends DatabaseAdapter<DBA>>(
   {
     name,
     updatedAt,
-    opts,
-  }: { name: string; updatedAt: UpdatedAt; opts: Record<string, unknown> },
+    args,
+  }: { name: string; updatedAt: UpdatedAt; args: Record<string, unknown> },
   props: MethodProps<DBA>
 ): Promise<PublicationResponse> {
   const publication = this._publications.get(name);
@@ -87,7 +87,7 @@ export async function subscribeMethod<DBA extends DatabaseAdapter<DBA>>(
 
   const publicationProps: PublicationProps<DBA> = { ...props, name, updatedAt };
 
-  let results = await publication(props.dba, opts, publicationProps);
+  let results = await publication(props.dba, args, publicationProps);
 
   results = await props.dba.publishHelper(results, publicationProps);
   /*
