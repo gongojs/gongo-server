@@ -164,6 +164,18 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
           "oauth2 strategy initiated without passReqToCallback: true"
         );
 
+      // @ts-expect-error: _var
+      if (strategy._pkceMethod) {
+        const entry = {
+          // @ts-expect-error: yeah we shouldn't really be using this
+          _id: strategy._key as string,
+          name: strategy.name as string,
+          type: "server",
+        };
+        this.strategyData.push(entry);
+        return;
+      }
+
       // @ts-expect-error: strictly speaking it's protected
       const oauth2 = strategy._oauth2;
 
@@ -184,6 +196,23 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
           // strategy._scope is new I think TODO, could be array too?  scopeSeparator.
           scope: extra.scope as string,
         },
+      });
+    } else if ("_oauth" in strategy) {
+      const _strategy = strategy as Record<string, unknown>;
+
+      console.log("Found oauth strategy " + _strategy.name);
+
+      // @ts-expect-error: uhhh...
+      if (!strategy._passReqToCallback)
+        throw new Error(
+          "oauth strategy initiated without passReqToCallback: true"
+        );
+
+      this.strategyData.push({
+        // @ts-expect-error: yeah we shouldn't really be using this
+        _id: strategy._key as string,
+        name: _strategy.name as string,
+        type: "server",
       });
     } else {
       console.log("Added unknown strategy " + strategy.name);
