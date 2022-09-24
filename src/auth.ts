@@ -8,14 +8,15 @@ import type DatabaseAdapter from "./DatabaseAdapter.js";
 import type { DbaUser } from "./DatabaseAdapter.js";
 import type GongoServerless from "./serverless.js";
 
-export interface StrategyData {
+export interface StrategyDataBase {
   _id: string;
   name: string;
   type: string;
   __updatedAt?: number;
+  redirect_uri?: string;
 }
 
-export interface OAuth2StrategyData extends StrategyData {
+export interface OAuth2StrategyData extends StrategyDataBase {
   type: "oauth2";
   oauth2: {
     authorize_url: string;
@@ -25,6 +26,8 @@ export interface OAuth2StrategyData extends StrategyData {
     scope: string;
   };
 }
+
+export type StrategyData = StrategyDataBase | OAuth2StrategyData;
 
 export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
   gongoServer: GongoServerless<DBA>;
@@ -41,6 +44,46 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
 
     this.passportVerify = this.passportVerify.bind(this);
     // this.ensureDbStrategyData = debounce(this.ensureDbStrategyData, 50);
+    gongoServer.method(
+      "getServiceLoginUrl",
+      async (db, { service }, { auth, req }) => {
+        const session = (await auth.getSessionData()) || {};
+
+        return await new Promise((resolve, reject) => {
+          let location = "";
+          const fakeReq = {
+            // passport sets logIn, logOut, isAuthenticated, isUnauthenticated, _sessionManager
+            query: {},
+            session,
+          };
+          const fakeRes = {
+            statusCode: 500,
+            setHeader(key: string, value: string) {
+              console.log("setHeader", key, value);
+              if (key === "Location" || key === "location") {
+                location = value;
+              }
+            },
+            async end() {
+              await auth.setSessionData(fakeReq.session);
+              // res.status(fakeRes.statusCode).end();
+              resolve(location);
+            },
+          };
+
+          const next = (error: unknown) => {
+            if (error) {
+              console.error(error);
+              reject(error);
+            } else {
+              reject("passport.authenticate() No such service: " + service);
+            }
+          };
+
+          passport.authenticate(service)(fakeReq, fakeRes, next);
+        });
+      }
+    );
   }
 
   async ensureDbStrategyData() {
@@ -76,10 +119,21 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
     profile: Profile,
     cb: VerifyCallback
   ) {
-    if (typeof req.query.state !== "string")
-      throw new Error("passportVerify(), typeof req.query.state !== 'string'");
+    // @ts-expect-error: TODO
+    const session = req.session;
+    let sessionId = session?._id;
 
-    const state = JSON.parse(req.query.state);
+    if (!sessionId) {
+      if (typeof req.query.state === "string") {
+        sessionId = JSON.parse(req.query.state).sessionId;
+      } else {
+        console.log(req.query.state);
+        throw new Error(
+          "passportVerify(), !sessionId, typeof req.query.state !== 'string'"
+        );
+      }
+    }
+
     // console.log(this); // gongoAuth (has gongoAuth.gongoServer)
     // console.log(state); // { sessionId, service: 'google' };
     // 'google' also in profile.provider
@@ -112,7 +166,7 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
         };
         if (!this.dba)
           throw new Error("passportVerify(), this.dba not defined");
-        this.dba.Users.setSessionData(state.sessionId, data);
+        this.dba.Users.setSessionData(sessionId, data);
 
         cb(null, user);
       })
@@ -130,7 +184,7 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
   passportComplete(
     req: Request,
     res: Response,
-    err: unknown,
+    error: unknown,
     user: DbaUser,
     info: unknown
   ) {
@@ -138,7 +192,17 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
       'WARNING, DEVEL TARGET_ORIGIN SET TO "*" IN GONGO-SERVER/AUTH.JS'
     );
     console.log("complete");
-    console.log({ err, user, info });
+
+    if (error) {
+      console.error(error);
+      let message = "Unknown";
+      if (error instanceof Error) message = error.message;
+      res.status(500).end(message);
+      return;
+    }
+
+    console.log({ user, info });
+
     //res.sendStatus(200);
     //
     const data = { userId: user._id };
@@ -164,39 +228,42 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
           "oauth2 strategy initiated without passReqToCallback: true"
         );
 
+      let entry: StrategyData;
+
       // @ts-expect-error: _var
       if (strategy._pkceMethod) {
-        const entry = {
+        entry = {
           // @ts-expect-error: yeah we shouldn't really be using this
           _id: strategy._key as string,
           name: strategy.name as string,
-          type: "server",
-        };
-        this.strategyData.push(entry);
-        return;
-      }
-
-      // @ts-expect-error: strictly speaking it's protected
-      const oauth2 = strategy._oauth2;
-
-      this.strategyData.push({
-        // @ts-expect-error: yeah we shouldn't really be using this
-        _id: strategy._key as string,
-        name: strategy.name as string,
-        type: "oauth2",
-        oauth2: {
-          // @ts-expect-error: strictly speaking it's protected
-          authorize_url: oauth2._authorizeUrl,
-          // @ts-expect-error: strictly speaking it's protected
-          client_id: oauth2._clientId,
+          type: "getServiceLoginUrl",
           // @ts-expect-error: strictly speaking it's protected
           redirect_uri: strategy._callbackURL,
-          response_type: "code",
-          // @ts-expect-error: strictly speaking it's protected
-          // strategy._scope is new I think TODO, could be array too?  scopeSeparator.
-          scope: extra.scope as string,
-        },
-      });
+        };
+      } else {
+        // @ts-expect-error: strictly speaking it's protected
+        const oauth2 = strategy._oauth2;
+        entry = {
+          // @ts-expect-error: yeah we shouldn't really be using this
+          _id: strategy._key as string,
+          name: strategy.name as string,
+          type: "oauth2",
+          oauth2: {
+            // @ts-expect-error: strictly speaking it's protected
+            authorize_url: oauth2._authorizeUrl,
+            // @ts-expect-error: strictly speaking it's protected
+            client_id: oauth2._clientId,
+            // @ts-expect-error: strictly speaking it's protected
+            redirect_uri: strategy._callbackURL,
+            response_type: "code",
+            // @ts-expect-error: strictly speaking it's protected
+            // strategy._scope is new I think TODO, could be array too?  scopeSeparator.
+            scope: extra.scope as string,
+          },
+        };
+      }
+
+      this.strategyData.push(entry);
     } else if ("_oauth" in strategy) {
       const _strategy = strategy as Record<string, unknown>;
 
@@ -212,7 +279,9 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
         // @ts-expect-error: yeah we shouldn't really be using this
         _id: strategy._key as string,
         name: _strategy.name as string,
-        type: "server",
+        type: "getServiceLoginUrl",
+        // @ts-expect-error: strictly speaking it's protected
+        redirect_uri: strategy._callbackURL,
       });
     } else {
       console.log("Added unknown strategy " + strategy.name);
