@@ -59,7 +59,6 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
           const fakeRes = {
             statusCode: 500,
             setHeader(key: string, value: string) {
-              console.log("setHeader", key, value);
               if (key === "Location" || key === "location") {
                 location = value;
               }
