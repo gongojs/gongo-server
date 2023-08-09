@@ -32,6 +32,9 @@ export interface PublicationProps<DBA extends DatabaseAdapter<DBA>>
   extends MethodProps<DBA> {
   name: string;
   updatedAt: UpdatedAt;
+  sort?: [string, "asc" | "desc"];
+  limit?: number;
+  lastSortedValue?: unknown;
 }
 
 type TypeOfFirstArg<T> = T extends (
@@ -79,13 +82,32 @@ export async function subscribeMethod<DBA extends DatabaseAdapter<DBA>>(
     name,
     updatedAt,
     args,
-  }: { name: string; updatedAt: UpdatedAt; args: Record<string, unknown> },
+    opts,
+    lastSortedValue,
+  }: {
+    name: string;
+    updatedAt: UpdatedAt;
+    args: Record<string, unknown>;
+    opts?: Record<string, unknown>;
+    lastSortedValue?: unknown;
+  },
   props: MethodProps<DBA>
 ): Promise<PublicationResponse> {
   const publication = this._publications.get(name);
   if (!publication) throw new Error("No such publication: " + name);
 
-  const publicationProps: PublicationProps<DBA> = { ...props, name, updatedAt };
+  const publicationProps: PublicationProps<DBA> = {
+    ...props,
+    name,
+    updatedAt,
+    lastSortedValue,
+  };
+
+  if (opts) {
+    if (opts.sort)
+      publicationProps.sort = opts.sort as [string, "asc" | "desc"];
+    if (opts.limit) publicationProps.limit = opts.limit as number;
+  }
 
   let results = await publication(props.dba, args, publicationProps);
 
