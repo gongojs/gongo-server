@@ -54,17 +54,40 @@ export async function GSExpressPost<DBA extends DatabaseAdapter<DBA>>(
     auth: new Auth(this.dba, query.auth),
   };
 
+  const calls = query.calls as [string, unknown][] | undefined;
+
   const out = {
-    calls: [] as Array<MethodResult>,
+    calls: new Array<MethodResult>((calls && calls.length) ?? 0),
   };
 
-  if (query.calls)
+  if (calls && calls.length) {
+    const promises = new Array<Promise<MethodResult>>(calls.length);
+
+    // Run non-subs first (i.e. so updates take place before subs)
+    for (let i = 0; i < calls.length; i++) {
+      const call = calls[i];
+      if (call[0] !== "subscribe")
+        promises[i] = this._methodExec(call[0], call[1], props);
+    }
+    await Promise.all(promises);
+
+    for (let i = 0; i < calls.length; i++) {
+      const call = calls[i];
+      if (call[0] === "subscribe")
+        promises[i] = this._methodExec(call[0], call[1], props);
+    }
+
+    out.calls = await Promise.all(promises);
+
+    /*
     out.calls = await Promise.all(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       query.calls.map(([name, query]: [string, any]) =>
         this._methodExec(name, query, props)
       )
     );
+    */
+  }
 
   // console.log(req.body);
   // console.log(out);
