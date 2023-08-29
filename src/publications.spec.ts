@@ -50,15 +50,15 @@ describe("publications", () => {
         },
       };
 
-      test.publish("echo", async (db, opts, props) => opts);
+      test.publish("echo", async (db, args, props) => args);
       // @ts-expect-error: using props stub from above
       const result = await test.subscribeMethod(
         props.dba,
-        { name: "echo", opts: "opts" },
+        { name: "echo", args: "args" },
         props
       );
       expect(result).toMatchObject({
-        results: "opts (helped)",
+        results: "args (helped)",
       });
     });
   });
