@@ -1,4 +1,4 @@
-import type { Request, RequestHandler, Response } from "express";
+import type { Request, Response } from "express";
 import type GongoServerless from "./serverless";
 import type { MethodProps, MethodResult } from "./serverless";
 import type DatabaseAdapter from "./DatabaseAdapter";
