@@ -4,6 +4,7 @@ import type { Request, RequestHandler } from "express";
 import { publish, subscribeMethod } from "./publications";
 import type { Publications } from "./publications";
 import { GSExpressPost } from "./express";
+import { GSVercelEdgePost} from "./vercelEdge";
 import builtinMethods from "./builtinMethods";
 import { insert, update, remove } from "./crud";
 //import ARSON from "arson";
@@ -39,14 +40,14 @@ export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
   methods: Map<string, MethodFunction<DBA>>;
   dba?: DBA;
   _publications: Publications<DBA> = new Map();
-  publish = publish<DBA>.bind(this);
+  publish = (publish<DBA>).bind(this);
   ARSON = ARSON;
   _supressConsoleErrors = false;
 
   constructor({ dba }: { dba?: DBA } = {}) {
     this.dba = dba;
     this.methods = new Map(Object.entries(builtinMethods));
-    this.method("subscribe", subscribeMethod<DBA>.bind(this));
+    this.method("subscribe", (subscribeMethod<DBA>).bind(this));
     /*
     this.method("changeSet", async (db, query, props) => {
       // TODO, v2 dba
@@ -120,6 +121,10 @@ export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
   }
 
   expressPost(): RequestHandler {
-    return GSExpressPost<DBA>.bind(this);
+    return (GSExpressPost<DBA>).bind(this);
+  }
+
+  vercelEdgePost() {
+    return (GSVercelEdgePost<DBA>).bind(this);
   }
 }
