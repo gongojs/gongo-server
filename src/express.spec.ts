@@ -1,5 +1,4 @@
 import express from "express";
-import type { Response } from "express";
 import bodyParser from "body-parser";
 import request from "supertest";
 
@@ -9,7 +8,8 @@ import GongoServerless from "./serverless";
 const textParser = bodyParser.text();
 
 describe("express", () => {
-  const gs = new GongoServerless();
+  // @ts-expect-error: stub
+  const gs = new GongoServerless({ dba: {}});
   const app = express();
   app.post("/", textParser, gs.expressPost());
 
