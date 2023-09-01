@@ -6,12 +6,6 @@ export type { Operation } from "fast-json-patch/module/core.js";
 import type { Profile } from "passport";
 export type { Profile } from "passport";
 
-interface InstanceWithToStringMethod {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-  toString(): string;
-}
-
 export interface DbaUser {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
@@ -25,6 +19,9 @@ export interface DbaUser {
 export interface DbaUserEmail {
   value: string;
   type?: string | undefined;
+  verified?: boolean | Date | null;
+  primary?: boolean;
+  public?: "public" | null;
 }
 
 export interface DbaUserService {

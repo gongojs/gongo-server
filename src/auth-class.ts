@@ -15,6 +15,7 @@ export default class Auth<
 
   async sid(): Promise<string | null> {
     // TODO. optionally check IP or other stuff
+    if (typeof this.untrusted.nextAuthSessionToken === "string") return this.untrusted.nextAuthSessionToken;
     if (typeof this.untrusted.sid === "string") return this.untrusted.sid;
     return null;
   }

@@ -38,13 +38,13 @@ export type MethodFunction<DBA extends DatabaseAdapter<DBA>> = (
 
 export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
   methods: Map<string, MethodFunction<DBA>>;
-  dba?: DBA;
+  dba: DBA;
   _publications: Publications<DBA> = new Map();
   publish = (publish<DBA>).bind(this);
   ARSON = ARSON;
   _supressConsoleErrors = false;
 
-  constructor({ dba }: { dba?: DBA } = {}) {
+  constructor({ dba }: { dba: DBA }) {
     this.dba = dba;
     this.methods = new Map(Object.entries(builtinMethods));
     this.method("subscribe", (subscribeMethod<DBA>).bind(this));
@@ -75,6 +75,7 @@ export default class GongoServerless<DBA extends DatabaseAdapter<DBA>> {
     query: any,
     props: MethodProps<DBA>
   ): Promise<MethodResult> {
+    // console.log("_methodExec", "name", name, "query", query, "props", props);
     const method = this.methods.get(name);
 
     if (!method) {

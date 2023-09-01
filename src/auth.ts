@@ -46,7 +46,7 @@ export default class GongoAuth<DBA extends DatabaseAdapter<DBA>> {
     // this.ensureDbStrategyData = debounce(this.ensureDbStrategyData, 50);
     gongoServer.method(
       "getServiceLoginUrl",
-      async (db, { service }, { auth, req }) => {
+      async (db, { service }, { auth /*, req */ }) => {
         const session = (await auth.getSessionData()) || {};
 
         return await new Promise((resolve, reject) => {

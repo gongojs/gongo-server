@@ -45,13 +45,18 @@ export async function GSExpressPost<DBA extends DatabaseAdapter<DBA>>(
     return;
   }
 
+  const cookie = req.headers.cookie;
+  const nextAuthSessionToken = (function () {
+    // next-auth.session-token=45df020e-1424-4d13-8bd5-5bd59851c774
+    const match = cookie && cookie.match(/\bnext-auth\.session-token=([^;]+)/);
+    return match && match[1];
+  })();
+
   const props: MethodProps<DBA> = {
     gs: this,
     req: req,
-    // @ts-expect-error: think more how to handle this TODO
     dba: this.dba,
-    // @ts-expect-error: think more how to handle this TODO
-    auth: new Auth(this.dba, query.auth),
+    auth: new Auth(this.dba, { nextAuthSessionToken, ...query.auth }),
   };
 
   const calls = query.calls as [string, unknown][] | undefined;

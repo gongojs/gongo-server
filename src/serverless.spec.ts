@@ -1,15 +1,19 @@
 import GongoServerless from "./serverless";
 
+class DummyDBA /*implements DatabaseAdapter<DummyDBA>*/ {}
+
 describe("GongoServerless2", () => {
   describe("methods", () => {
     it("throws on duplicate method", () => {
-      const gs = new GongoServerless();
+      // @ts-expect-error: stub
+      const gs = new GongoServerless({ dba: DummyDBA });
       gs.method("test", () => null);
       expect(() => gs.method("test", () => null)).toThrow(/already exists/);
     });
 
     it("throws on missing method", async () => {
-      const gs = new GongoServerless();
+      // @ts-expect-error: stub
+      const gs = new GongoServerless({ dba: DummyDBA });
       gs.method("null", () => null);
       // @ts-expect-error: stub
       const result = await gs._methodExec("404", {}, {});
@@ -21,7 +25,8 @@ describe("GongoServerless2", () => {
     });
 
     it("returns methodfunc result", async () => {
-      const gs = new GongoServerless();
+      // @ts-expect-error: stub
+      const gs = new GongoServerless({ dba: DummyDBA });
       gs.method("test", () => "test");
       // @ts-expect-error: stub
       expect(await gs._methodExec("test", {}, {})).toMatchObject({
@@ -30,7 +35,8 @@ describe("GongoServerless2", () => {
     });
 
     it("passes query", async () => {
-      const gs = new GongoServerless();
+      // @ts-expect-error: stub
+      const gs = new GongoServerless({ dba: DummyDBA });
       // @ts-expect-error: stub
       expect(await gs._methodExec("echo", "test", {})).toMatchObject({
         $result: "test",
@@ -38,7 +44,8 @@ describe("GongoServerless2", () => {
     });
 
     it("handles thrown errors", async () => {
-      const gs = new GongoServerless();
+      // @ts-expect-error: stub
+      const gs = new GongoServerless({ dba: DummyDBA });
       gs._supressConsoleErrors = true;
       gs.method("error", () => {
         throw new Error("My Error");
@@ -52,7 +59,8 @@ describe("GongoServerless2", () => {
     });
 
     it("handles thrown non-errors", async () => {
-      const gs = new GongoServerless();
+      // @ts-expect-error: stub
+      const gs = new GongoServerless({ dba: DummyDBA });
       gs._supressConsoleErrors = true;
       gs.method("error", () => {
         throw "string error";
